@@ -14,8 +14,19 @@ namespace WebTODO
 
             var app = builder.Build();
 
-            app.UseDefaultFiles();
             app.UseStaticFiles();
+
+            app.MapGet("/", async (HttpContext ctx) =>
+            {
+                ctx.Response.ContentType = "text/html";
+                await ctx.Response.SendFileAsync("html/home.html");
+            });
+
+            app.MapGet("/list", async (HttpContext ctx) =>
+            {
+                ctx.Response.ContentType = "text/html";
+                await ctx.Response.SendFileAsync("html/list.html");
+            });
 
             // Get all items
             app.MapGet("/list-get", (IRepository repository) => Results.Json(repository.TodoList));
@@ -24,20 +35,10 @@ namespace WebTODO
             app.MapPut("/list-edit/{id:int}", (HttpContext ctx, IRepository repository, int id) => {
                 if (ctx.Request.HasFormContentType)
                 {
-                    TodoItem? itemToUpdate = repository.GetItem(id);
-
-                    if (itemToUpdate != null)
-                    {
-                        itemToUpdate.Title = ctx.Request.Form["title"];
-                        itemToUpdate.Description = ctx.Request.Form["description"];
-                        if (DateOnly.TryParse(ctx.Request.Form["date"], out DateOnly date))
-                        {
-                            itemToUpdate.Date = date;
-                        }
-
-                        return Results.Json(new { result = true, id });
-                    }
+                    repository.UpdateItem(id, ctx.Request.Form);
+                    return Results.Json(new { result = true, id });
                 }
+
                 return Results.Json(new { result = false, id });
             });
 

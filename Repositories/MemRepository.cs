@@ -10,9 +10,9 @@ namespace WebTODO.Repositories
                 new() { Title = "Chores", Description = "Do chores", Date = new DateOnly(2024,3,9)},
                 ];
 
-        public TodoItem AddItem(TodoItem item)
+        public void AddItem(TodoItem item)
         {
-            throw new NotImplementedException();
+            TodoList.Add(item);
         }
 
         public bool RemoveItem(TodoItem item)
@@ -25,9 +25,21 @@ namespace WebTODO.Repositories
             return TodoList.Find(t => t.Id == id);
         }
 
-        public TodoItem UpdateItem(int id)
+        public TodoItem? UpdateItem(int id, IFormCollection data)
         {
-            throw new NotImplementedException();
+            TodoItem? itemToUpdate = GetItem(id);
+
+            if (itemToUpdate != null)
+            {
+                itemToUpdate.Title = data["title"];
+                itemToUpdate.Description = data["description"];
+                if (DateOnly.TryParse(data["date"], out DateOnly date))
+                {
+                    itemToUpdate.Date = date;
+                }
+            }
+
+            return itemToUpdate;
         }
     }
 }

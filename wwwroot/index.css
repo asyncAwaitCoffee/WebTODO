@@ -30,7 +30,7 @@ header {
 }
 
 #emblem {
-    width: 5%;
+    width: 15%;
     text-align: center;
     background-image: url("/to-do-list.png");
     background-size: contain;
@@ -46,14 +46,12 @@ li {
     justify-content: center;
     align-items: center;
     cursor: pointer;
-}
-
-li:hover {
-    color: #abbbea;
+    border-bottom: 5px solid transparent;
+    transition: border-bottom 0.3s;
 }
 
 #nav-main li:hover {
-    background-color: #3f4053;
+    border-bottom: 5px solid #3f4053;
 }
 
 #nav-main li:last-child {
@@ -101,6 +99,10 @@ section {
 
     display: flex;
     justify-content: center;
+}
+
+#nav-todo li:hover {
+    color: #abbbea;
 }
 
 .modal {
