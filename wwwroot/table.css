@@ -1,0 +1,42 @@
+﻿#sec-todo-table {
+    height: 95%;
+    background-color: #9ebcd8;
+    border-left: 1px solid #3f4053;
+    border-right: 1px solid #3f4053;
+    border-bottom: 1px solid #3f4053;
+    border-radius: 0 0 10px 10px;
+
+    display: flex;
+    justify-content: center;
+    align-content: flex-start;
+    align-items: flex-start;
+
+    padding: 10px;
+}
+
+table {
+    width: 90%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 5px;
+    text-align: center;
+}
+
+td:nth-child(3) {
+    text-align: left;
+}
+
+tr {
+    border-bottom: 1px solid black;
+}
+
+tr:nth-child(2n):not(:first-child) {
+    background-color: rgba(0,0,0,0.1);
+}
+
+tr button {
+    padding: 5px;
+    font-size: inherit;
+}

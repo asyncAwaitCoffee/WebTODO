@@ -1,0 +1,32 @@
+﻿form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    width: 40%;
+    padding: 20px;
+    background-color: rgba(0,0,0,0.3);
+
+    border-radius: 10px;
+}
+
+legend {
+    color: white;
+    font-size: 1.5em;
+}
+
+label {
+    color: white;
+    width: 90%;
+}
+
+input, textarea {
+    padding: 5px;
+    margin: 5px;
+
+    width: 90%;
+    border-radius: 5px;
+
+    font-size: 1.2rem;
+}

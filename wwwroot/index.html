@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="index.css" rel="stylesheet" />
+    <link href="table.css" rel="stylesheet" />
+    <link href="forms.css" rel="stylesheet" />
+    <title>TODO</title>
+</head>
+<body>
+    <header>
+        <div id="emblem"></div>
+        <nav>
+            <ul id="nav-main">
+                <li>Home</li>
+                <li>List</li>
+                <li>Sign In</li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section id="sec-todo-control">
+            <ul id="nav-todo">
+                <li id="li-add">Add</li>
+                <li>Order</li>
+                <li>Filter</li>
+            </ul>
+        </section>
+        <section id="sec-todo-table">
+            <table>
+                <tr>
+                    <th>№</th><th>Title</th><th>Description</th><th>Date</th><th>Edit</th>
+                </tr>
+            </table>
+        </section>
+    </main>
+    <footer></footer>
+
+    <script src="index.js"></script>
+    <script>
+        GetTODOList();
+
+        document.getElementById("li-add").addEventListener("click", (ev) => {
+            BuildForm("add");
+        });
+    </script>
+</body>
+</html>
