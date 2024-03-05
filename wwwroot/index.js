@@ -45,32 +45,24 @@ function CreateEditButtons(todoItem) {
     buttonRemove.dataset.itemId = todoItem.id;
 
     buttonRemove.addEventListener("click", async (ev) => {
-        await fetch(`/list-remove/${todoItem.id}`, {
-            method: "DELETE"
-        });
+        SubmitRemove(todoItem.id);
     })
 
     return { buttonEdit, buttonRemove }
 }
 
 function BuildForm(type, todoItem = null) {
-    const modal = document.createElement("div");
-    modal.classList.add("modal");
 
-    modal.addEventListener("mousedown", (ev) => {
-        if (ev.target == modal) {
-            modal.parentNode.removeChild(modal);
-        }
-    });
+    const modal = CreateModal();
 
     const form = document.createElement("form");
     form.setAttribute("action", "/");
 
-    let path, method;
+    let path, method, legendText;
 
     switch (type) {
-        case "edit": path = `/list-edit/${todoItem.id}`; method = "PUT"; break;
-        case "add": path = `/list-add`; method = "POST"; break;
+        case "edit": path = `/list-edit/${todoItem.id}`; method = "PUT"; legendText = "Edit Item"; break;
+        case "add": path = `/list-add`; method = "POST"; legendText = "Add Item"; break;
     }
 
     if (!path) {
@@ -89,7 +81,7 @@ function BuildForm(type, todoItem = null) {
     });
 
     const legend = document.createElement("legend");
-    legend.textContent = "Item Edit";
+    legend.textContent = legendText;
     form.appendChild(legend);
 
     const inputId = document.createElement("input");
@@ -136,4 +128,44 @@ function BuildForm(type, todoItem = null) {
     modal.appendChild(form);
 
     document.body.appendChild(modal);
+}
+
+function SubmitRemove(itemId) {
+    const modal = CreateModal();
+
+    const messageBlock = document.createElement("div");
+    messageBlock.classList.add("message");
+
+    const messageText = document.createElement("div");
+
+    const buttonOk = document.createElement("button");
+    buttonOk.textContent = "Ok";
+
+    buttonOk.addEventListener("click", async (ev) => {
+        await fetch(`/list-remove/${itemId}`, {
+            method: "DELETE"
+        });
+    })    
+
+    const buttonCancel = document.createElement("button");
+    buttonCancel.textContent = "Cancel";
+
+    messageBlock.append(messageText, buttonOk, buttonCancel);
+
+    modal.appendChild(messageBlock);
+
+    document.body.appendChild(modal);
+}
+
+function CreateModal() {
+    const modal = document.createElement("div");
+    modal.classList.add("modal");
+
+    modal.addEventListener("mousedown", (ev) => {
+        if (ev.target == modal) {
+            modal.parentNode.removeChild(modal);
+        }
+    });
+
+    return modal;
 }

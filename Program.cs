@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using WebTODO.Models;
+using WebTODO.Repositories;
 
 namespace WebTODO
 {
@@ -7,26 +8,23 @@ namespace WebTODO
     {
         public static void Main(string[] args)
         {
-            List<TodoItem> todoList = [
-                new() { Title = "Vacuum", Description = "Vacuum my room", Date = new DateOnly(2024,3,10)},
-                new() { Title = "Dishes", Description = "Wash dishes", Date = new DateOnly(2024,3,7)},
-                new() { Title = "Chores", Description = "Do chores", Date = new DateOnly(2024,3,9)},
-                ];
 
             var builder = WebApplication.CreateBuilder(args);
+            builder.Services.AddSingleton<IRepository, MemRepository>();
+
             var app = builder.Build();
 
             app.UseDefaultFiles();
             app.UseStaticFiles();
 
             // Get all items
-            app.MapGet("/list-get", () => Results.Json(todoList));
+            app.MapGet("/list-get", (IRepository repository) => Results.Json(repository.TodoList));
 
             // Edit item in the list
-            app.MapPut("/list-edit/{id:int}", (HttpContext ctx, int id) => {
+            app.MapPut("/list-edit/{id:int}", (HttpContext ctx, IRepository repository, int id) => {
                 if (ctx.Request.HasFormContentType)
                 {
-                    TodoItem? itemToUpdate = todoList.Find(t => t.Id == id);
+                    TodoItem? itemToUpdate = repository.GetItem(id);
 
                     if (itemToUpdate != null)
                     {
@@ -44,7 +42,7 @@ namespace WebTODO
             });
 
             // Add new item to the list
-            app.MapPost("/list-add", (HttpContext ctx) =>
+            app.MapPost("/list-add", (HttpContext ctx, IRepository repository) =>
             {
                 if (ctx.Request.HasFormContentType)
                 {
@@ -57,7 +55,7 @@ namespace WebTODO
                             Date = date
                         };
 
-                        todoList.Add(newItem);
+                        repository.AddItem(newItem);
 
                         return Results.Json(new { result = true, newItem.Id });
                     }
@@ -67,11 +65,11 @@ namespace WebTODO
             
 
             // Remove item from the list
-            app.MapDelete("/list-remove/{id:int}", (int id) => {
-                TodoItem? itemToRemove = todoList.Find(t => t.Id == id);
+            app.MapDelete("/list-remove/{id:int}", (IRepository repository, int id) => {
+                TodoItem? itemToRemove = repository.GetItem(id);
                 if (itemToRemove != null)
                 {
-                    todoList.Remove(itemToRemove);
+                    repository.RemoveItem(itemToRemove);
                     Results.Json(new { remove = "ok", id });
                 }
             });
