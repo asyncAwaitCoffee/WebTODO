@@ -1,4 +1,8 @@
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
+using System.Security.Claims;
 using WebTODO.Models;
 using WebTODO.Repositories;
 
@@ -11,10 +15,17 @@ namespace WebTODO
 
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddSingleton<IRepository, MemRepository>();
+            builder.Services.AddSingleton<IUsersRepository, MemUsersRepository>();
+
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                            .AddCookie(options => options.LoginPath = "/sign");
+            builder.Services.AddAuthorization();
 
             var app = builder.Build();
 
             app.UseStaticFiles();
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.MapGet("/", async (HttpContext ctx) =>
             {
@@ -22,10 +33,40 @@ namespace WebTODO
                 await ctx.Response.SendFileAsync("html/home.html");
             });
 
-            app.MapGet("/list", async (HttpContext ctx) =>
+            app.MapGet("/list", [Authorize] async (HttpContext ctx) =>
             {
                 ctx.Response.ContentType = "text/html";
                 await ctx.Response.SendFileAsync("html/list.html");
+            });
+
+            app.MapGet("/sign", async (HttpContext ctx) =>
+            {
+                ctx.Response.ContentType = "text/html";
+                await ctx.Response.SendFileAsync("html/signin.html");
+            });
+
+            app.MapPost("/signin", async (HttpContext ctx, IUsersRepository usersRepo) =>
+            {
+                if (ctx.Request.HasFormContentType)
+                {
+                    string? name = ctx.Request.Form["name"];
+                    string? password = ctx.Request.Form["password"];
+
+                    if (name is not null && password is not null)
+                    {
+                        User? user = usersRepo.GetUser(name, password);
+
+                        if (user != null)
+                        {
+                            List<Claim> claims = [new Claim(ClaimTypes.NameIdentifier, name)];
+                            ClaimsIdentity claimsIdentity = new(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                            ClaimsPrincipal claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+                            await ctx.SignInAsync(claimsPrincipal);
+                        }
+                    }
+                }
+                ctx.Response.ContentType = "text/html";
+                await ctx.Response.SendFileAsync("html/signin.html");
             });
 
             // Get all items
